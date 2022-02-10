@@ -32,6 +32,7 @@ var (
 
 // ConnSyncer describes connection sink for syslog.
 type ConnSyncer struct {
+	enabled bool
 	network string
 	raddr   string
 	conn    net.Conn
@@ -52,13 +53,31 @@ func NewConnSyncer(network, raddr string) (*ConnSyncer, error) {
 	return s, nil
 }
 
-// connect makes a connection to the syslog server.
-func (s *ConnSyncer) connect() error {
+func (s *ConnSyncer) Enable(network, raddr string) {
+	s.network = network
+	s.raddr = raddr
+	s.enabled = true
+	s.close()
+}
+
+func (s *ConnSyncer) Disable() {
+	s.enabled = false
+}
+
+func (s *ConnSyncer) close() {
 	if s.conn != nil {
 		// ignore err from close, it makes sense to continue anyway
-		s.conn.Close()
+		_ = s.conn.Close()
 		s.conn = nil
 	}
+}
+
+// connect makes a connection to the syslog server.
+func (s *ConnSyncer) connect() error {
+	if s.enabled == false {
+		return nil
+	}
+	s.close()
 
 	var c net.Conn
 	c, err := net.Dial(s.network, s.raddr)
@@ -72,6 +91,11 @@ func (s *ConnSyncer) connect() error {
 
 // Write writes to syslog with retry.
 func (s *ConnSyncer) Write(p []byte) (n int, err error) {
+	if s.enabled == false {
+		s.close()
+		return n, nil
+	}
+
 	if s.conn != nil {
 		if n, err := s.conn.Write(p); err == nil {
 			return n, err
