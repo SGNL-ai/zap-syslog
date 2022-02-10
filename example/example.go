@@ -3,10 +3,10 @@ package main
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"github.com/yumm007/zap-syslog"
+	"github.com/yumm007/zap-syslog/syslog"
 	"os"
 
-	"github.com/imperfectgo/zap-syslog"
-	"github.com/imperfectgo/zap-syslog/syslog"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
