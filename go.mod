@@ -3,7 +3,6 @@ module github.com/yumm007/zap-syslog
 go 1.17
 
 require (
-	github.com/imperfectgo/zap-syslog v0.1.1
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/multierr v1.7.0
 	go.uber.org/zap v1.21.0
