@@ -21,6 +21,7 @@
 package zapsyslog
 
 import (
+	"go.uber.org/atomic"
 	"net"
 
 	"go.uber.org/zap/zapcore"
@@ -32,7 +33,7 @@ var (
 
 // ConnSyncer describes connection sink for syslog.
 type ConnSyncer struct {
-	enabled bool
+	enabled atomic.Bool
 	network string
 	raddr   string
 	conn    net.Conn
@@ -56,12 +57,12 @@ func NewConnSyncer(network, raddr string) (*ConnSyncer, error) {
 func (s *ConnSyncer) Enable(network, raddr string) {
 	s.network = network
 	s.raddr = raddr
-	s.enabled = true
+	s.enabled.Store(true)
 	s.close()
 }
 
 func (s *ConnSyncer) Disable() {
-	s.enabled = false
+	s.enabled.Store(false)
 }
 
 func (s *ConnSyncer) close() {
@@ -74,7 +75,7 @@ func (s *ConnSyncer) close() {
 
 // connect makes a connection to the syslog server.
 func (s *ConnSyncer) connect() error {
-	if s.enabled == false {
+	if s.enabled.Load() == false {
 		return nil
 	}
 	s.close()
@@ -91,7 +92,7 @@ func (s *ConnSyncer) connect() error {
 
 // Write writes to syslog with retry.
 func (s *ConnSyncer) Write(p []byte) (n int, err error) {
-	if s.enabled == false {
+	if s.enabled.Load() == false {
 		s.close()
 		return n, nil
 	}
