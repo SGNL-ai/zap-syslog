@@ -38,6 +38,7 @@ type ConnSyncer struct {
 	hostAsIP bool
 	network  string
 	raddr    string
+	localIP  string
 	conn     net.Conn
 }
 
@@ -90,6 +91,16 @@ func (s *ConnSyncer) connect() error {
 	}
 
 	s.conn = c
+
+	// update local addr
+	localaddr := c.LocalAddr().String()
+	ipport := strings.Split(localaddr, ":")
+	if len(ipport) >= 1 {
+		s.localIP = ipport[0]
+	} else {
+		s.localIP = "-"
+	}
+
 	return nil
 }
 
@@ -106,9 +117,9 @@ func (s *ConnSyncer) Write(p []byte) (n int, err error) {
 		if s.hostAsIP {
 			log := strings.SplitN(string(p), " ", 4)
 			if len(log) >= 3 {
-				log[2] = s.conn.LocalAddr().String()
+				log[2] = s.localIP
+				p = []byte(strings.Join(log, " "))
 			}
-			p = []byte(strings.Join(log, ""))
 		}
 		if n, err := s.conn.Write(p); err == nil {
 			return n, err
