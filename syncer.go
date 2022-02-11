@@ -23,6 +23,7 @@ package zapsyslog
 import (
 	"go.uber.org/atomic"
 	"net"
+	"strings"
 
 	"go.uber.org/zap/zapcore"
 )
@@ -33,17 +34,19 @@ var (
 
 // ConnSyncer describes connection sink for syslog.
 type ConnSyncer struct {
-	enabled atomic.Bool
-	network string
-	raddr   string
-	conn    net.Conn
+	enabled  atomic.Bool
+	hostAsIP bool
+	network  string
+	raddr    string
+	conn     net.Conn
 }
 
 // NewConnSyncer returns a new conn sink for syslog.
-func NewConnSyncer(network, raddr string) (*ConnSyncer, error) {
+func NewConnSyncer(network, raddr string, HostAsIP bool) (*ConnSyncer, error) {
 	s := &ConnSyncer{
-		network: network,
-		raddr:   raddr,
+		network:  network,
+		raddr:    raddr,
+		hostAsIP: HostAsIP,
 	}
 
 	err := s.connect()
@@ -98,6 +101,15 @@ func (s *ConnSyncer) Write(p []byte) (n int, err error) {
 	}
 
 	if s.conn != nil {
+		// replace host name to ip addr
+		// <134>1 2022-02-10T23:52:22.556653+08:00 yumingmingdeMacBook-Pro.local season 9229 - - {"caller":"logger/logger.go:31","msg":"="}
+		if s.hostAsIP {
+			log := strings.SplitN(string(p), " ", 4)
+			if len(log) >= 3 {
+				log[2] = s.conn.LocalAddr().String()
+			}
+			p = []byte(strings.Join(log, ""))
+		}
 		if n, err := s.conn.Write(p); err == nil {
 			return n, err
 		}
