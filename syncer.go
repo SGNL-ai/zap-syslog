@@ -21,9 +21,10 @@
 package zapsyslog
 
 import (
-	"go.uber.org/atomic"
 	"net"
 	"strings"
+
+	"go.uber.org/atomic"
 
 	"go.uber.org/zap/zapcore"
 )
@@ -79,7 +80,7 @@ func (s *ConnSyncer) close() {
 
 // connect makes a connection to the syslog server.
 func (s *ConnSyncer) connect() error {
-	if s.enabled.Load() == false {
+	if !s.enabled.Load() {
 		return nil
 	}
 	s.close()
@@ -106,7 +107,7 @@ func (s *ConnSyncer) connect() error {
 
 // Write writes to syslog with retry.
 func (s *ConnSyncer) Write(p []byte) (n int, err error) {
-	if s.enabled.Load() == false {
+	if !s.enabled.Load() {
 		s.close()
 		return n, nil
 	}

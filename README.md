@@ -1,5 +1,7 @@
 # zap-syslog
 
+SGNL zap syslog library
+
 [![GoDoc](https://godoc.org/github.com/imperfectgo/zap-syslog?status.svg)](https://godoc.org/github.com/imperfectgo/zap-syslog)
 [![Build Status](https://travis-ci.org/imperfectgo/zap-syslog.svg?branch=master)](https://travis-ci.org/imperfectgo/zap-syslog)
 [![Go Report Card](https://goreportcard.com/badge/github.com/imperfectgo/zap-syslog)](https://goreportcard.com/report/github.com/imperfectgo/zap-syslog)
