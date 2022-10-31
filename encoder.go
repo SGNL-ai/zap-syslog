@@ -21,13 +21,14 @@
 package zapsyslog
 
 import (
-	"github.com/yumm007/zap-syslog/internal"
-	"github.com/yumm007/zap-syslog/internal/bufferpool"
-	"github.com/yumm007/zap-syslog/syslog"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/SGNL-ai/zap-syslog/internal"
+	"github.com/SGNL-ai/zap-syslog/internal/bufferpool"
+	"github.com/SGNL-ai/zap-syslog/syslog"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"

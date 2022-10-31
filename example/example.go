@@ -3,9 +3,10 @@ package main
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"github.com/yumm007/zap-syslog"
-	"github.com/yumm007/zap-syslog/syslog"
 	"os"
+
+	zapsyslog "github.com/SGNL-ai/zap-syslog"
+	"github.com/SGNL-ai/zap-syslog/syslog"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -30,7 +31,7 @@ func main() {
 		App:      "zapsyslog-test",
 	})
 
-	sink, err := zapsyslog.NewConnSyncer("tcp", "localhost:514")
+	sink, err := zapsyslog.NewConnSyncer("tcp", "localhost:514", true)
 	if err != nil {
 		panic(err)
 	}
